@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ConsoleSample
@@ -9,6 +10,15 @@ namespace ConsoleSample
     {
         static void Main(string[] args)
         {
+
+            int worker = 0;
+            int io = 0;
+            ThreadPool.GetAvailableThreads(out worker, out io);
+
+            Console.WriteLine("Thread pool threads available at startup: ");
+            Console.WriteLine("   Worker threads: {0:N0}", worker);
+            Console.WriteLine("   Asynchronous I/O threads: {0:N0}", io);
+
             Console.WriteLine("Main: Starting program");
 
             var asyncClass = new AsyncClass();
