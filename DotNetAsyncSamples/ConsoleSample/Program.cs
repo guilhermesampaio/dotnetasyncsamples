@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace ConsoleSample
 {
@@ -11,30 +12,105 @@ namespace ConsoleSample
         static void Main(string[] args)
         {
 
-            int worker = 0;
-            int io = 0;
-            ThreadPool.GetAvailableThreads(out worker, out io);
+            //int worker = 0;
+            //int io = 0;
+            //ThreadPool.GetAvailableThreads(out worker, out io);
 
-            Console.WriteLine("Thread pool threads available at startup: ");
-            Console.WriteLine("   Worker threads: {0:N0}", worker);
-            Console.WriteLine("   Asynchronous I/O threads: {0:N0}", io);
+            //Console.WriteLine("Thread pool threads available at startup: ");
+            //Console.WriteLine("   Worker threads: {0:N0}", worker);
+            //Console.WriteLine("   Asynchronous I/O threads: {0:N0}", io);
 
-            Console.WriteLine("Main: Starting program");
+            //Console.WriteLine("Main: Starting program");
 
-            var asyncClass = new AsyncClass();
+            //var asyncClass = new AsyncClass();
 
-            Console.WriteLine("Main: Before call asyncClass.GetSomeStrinAsync()");
+            //Console.WriteLine("Main: Before call asyncClass.GetSomeStrinAsync()");
 
-            //ExecutionWithAwait(asyncClass);
+            ////ExecutionWithAwait(asyncClass);
 
-            ////ExecutionWithoutAwait(asyncClass);
+            //////ExecutionWithoutAwait(asyncClass);
 
-            asyncClass.WriteFileAsync();
-            
-            Console.WriteLine("Main: After call asyncClass.GetSomeStrinAsync()");
+            //asyncClass.WriteFileAsync();
+
+            //Console.WriteLine("Main: After call asyncClass.GetSomeStrinAsync()");
+
+
+            //Console.WriteLine("Before method B");
+            //BDiferente();
+
+
+            var soma = HandleMultipleTasks();
+            Console.WriteLine($"After HandleMultipleTasks");
 
             Console.ReadLine();
+
+            
         }
+
+        static async Task B()
+        {
+            Console.WriteLine("Antes do await C");
+            var resultado = await C();
+            Console.WriteLine($"Resultado: {resultado}");
+            Console.WriteLine("Depois do await C");
+        }
+
+
+        static void BDiferente()
+        {
+            Console.WriteLine("Antes do await C");
+            var resultado = C().ContinueWith((antecedent) => Console.WriteLine("Após execução da tarefa que não foi aguardada!!!!"));
+            Console.WriteLine($"Resultado: {resultado}");
+            Console.WriteLine("Depois do await C");
+        }
+
+
+        static async Task<int> C()
+        {
+
+            await Task.Delay(TimeSpan.FromSeconds(5));
+
+            return 10;
+
+        }
+
+
+        static async Task HandleMultipleTasks()
+        {
+            //Task task1 = Task.Run(() => PerformSomeWork(1));
+            //Task task2 = Task.Run(() => PerformSomeWork(2));
+            //Task task3 = Task.Run(() => PerformSomeWork(3));
+            //Task task4 = Task.Run(() => PerformSomeWork(4));
+            
+            //var tasks = new Task[4] { task1, task2, task3, task4 };
+
+            var tasks2 = new List<Task>();
+
+            for (int i = 0; i <= 3; i++)
+            {
+                tasks2.Add(Task.Run(() => PerformSomeWork(i)));
+            }
+
+            
+
+            Console.WriteLine("Before await all");
+            //await Task.WhenAll(tasks2);
+            await Task.WhenAny(tasks2);
+            Console.WriteLine("After await all");
+        }
+
+        private static void PerformSomeWork(int id)
+        {
+            Console.WriteLine($"Task {id}");
+            //Thread.Sleep(TimeSpan.FromSeconds(1));
+            var currentThread = Thread.CurrentThread.ManagedThreadId;
+            Console.WriteLine($"Current Thread: {currentThread}");
+            
+        }
+
+
+
+
 
 
         private static async Task ExecutionWithAwait(AsyncClass asyncClass)
